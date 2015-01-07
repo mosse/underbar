@@ -103,9 +103,9 @@
       }
     });
     return results;
-    //Getting closer here... need to pass a value to test, something like collection[i]?*/
+    //Getting closer here... need to pass a value to test, something like collection[i]?
     //_.filter(collection, function(x){
-    //!test(collection[x]);
+    //return !test(x);
     //});
   };
 

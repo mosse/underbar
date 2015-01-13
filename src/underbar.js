@@ -118,14 +118,6 @@
       }
     });
     return results;
-
-    /*var results = [];
-    _.each(array, function(x){
-      if(_.indexOf(results, array[x]) === -1){
-        results.push(x);
-      }
-    });
-    return results;*/
   };
 
 
@@ -135,17 +127,9 @@
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
     var results = [];
-    //if (Array.isArray(collection)){
         for (var i = 0; i < collection.length; i++) {
           results.push(iterator(collection[i])) ;
         };
-    //}
-    /*else {
-        for(var prop in collection) {
-          if(collection.hasOwnProperty(prop))
-            results.push(iterator(collection[prop], prop, collection));
-        }
-    };*/
     return results;
   };
 
@@ -214,15 +198,46 @@
 
 
   // Determine whether all of the elements match a truth test.
-  _.every = function(collection, iterator) {
+
+   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+
+    var answer = _.reduce(collection, function(everyTrue, item){
+      if (!everyTrue) {
+        return false;
+      }
+
+      return Boolean(iterator(item));
+
+    }, true);
+    return answer;
   };
+
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+    if (Object.keys(collection).length === 0 || collection.length === 0) {
+    return false;
+    }
+    return _.reduce(collection, function(total, n){
+      if (total) {
+        return true;
+      }
+      else {
+        return Boolean(iterator(n));
+      }
+    }, false);
   };
+
+  
 
 
   /**
@@ -244,11 +259,27 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+     var source = arguments[i];
+      for (var prop in source) {
+        if (hasOwnProperty.call(source, prop)) {
+            obj[prop] = source[prop];
+        }
+      }
+    }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    for (var i = 1  ; i < arguments.length; i++) {
+      var source = arguments[i];
+      for (var prop in source) {
+        if (obj[prop] === void 0) obj[prop] = source[prop];
+      }
+    }
+    return obj;
   };
 
 
@@ -292,6 +323,19 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var cache = {};
+    var result;
+    return function() {
+      var args = Array.slice(arguments);
+      if (args in cache){
+        result = cache[args];
+      }
+      else {
+        result = func.apply(this, arguments);
+        cache[args] = result;
+      }
+      return result;
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -301,7 +345,12 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = Array.prototype.slice.call(arguments, 2);
+    return setTimeout(function(){
+      return func.apply(this, args);
+    }, wait);
   };
+    
 
 
   /**
@@ -315,6 +364,18 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+      var newArray = array.slice(), tempValue, randIndex;
+      var currentIndex = newArray.length;
+
+      while (0 !== currentIndex){
+        randIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        tempValue = newArray[currentIndex];
+        newArray[currentIndex] = newArray[randIndex];
+        newArray[randIndex] = tempValue;
+      }
+      return newArray;
   };
 
 
